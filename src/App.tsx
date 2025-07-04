@@ -10,6 +10,7 @@ import { Analytics } from "./components/Analytics";
 import { UserProfile } from "./components/UserProfile";
 import { useAccount } from "wagmi";
 import WalletSyncer from "./components/WalletSyncer";
+import { Toaster } from "react-hot-toast";
 
 function AppContent() {
   const { isConnected, isConnecting } = useAccount();
@@ -66,6 +67,7 @@ function App() {
   return (
     <AppProvider>
       <WalletSyncer />
+      <Toaster position="top-right" />
       <AppContent />
     </AppProvider>
   );

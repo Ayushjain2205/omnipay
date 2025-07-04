@@ -12,6 +12,7 @@ import {
 import { useApp } from "../context/AppContext";
 import { CheckoutPage } from "../types";
 import { supabase } from "../lib/supabase";
+import toast from "react-hot-toast";
 
 interface CheckoutPagesProps {
   onViewChange: (view: string, data?: any) => void;
@@ -29,9 +30,15 @@ export function CheckoutPages({ onViewChange }: CheckoutPagesProps) {
     onViewChange("page-builder", page);
   };
 
+  const handleDeletePage = async (id: string) => {
+    await deleteCheckoutPage(id);
+    toast.success("Page deleted");
+  };
+
   const copyPaymentLink = (pageId: string) => {
     const link = `${window.location.origin}/checkout/${pageId}`;
     navigator.clipboard.writeText(link);
+    toast.success("Payment link copied!");
   };
 
   const generateQR = (pageId: string) => {
@@ -171,7 +178,7 @@ export function CheckoutPages({ onViewChange }: CheckoutPagesProps) {
                     </button>
                   </div>
                   <button
-                    onClick={() => deleteCheckoutPage(page.id)}
+                    onClick={() => handleDeletePage(page.id)}
                     className="text-gray-400 hover:text-red-600 transition-colors"
                     title="Delete page"
                   >
