@@ -57,4 +57,6 @@ export interface User {
   website?: string;
   description?: string;
   connectedAt: string;
+  logo?: string;
+  banner?: string;
 }

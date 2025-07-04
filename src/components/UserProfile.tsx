@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
-import { User, Save, Wallet } from 'lucide-react';
-import { useApp } from '../context/AppContext';
+import React, { useState } from "react";
+import { User, Save, Wallet } from "lucide-react";
+import { useApp } from "../context/AppContext";
 
 export function UserProfile() {
   const { user, updateUserProfile } = useApp();
   const [formData, setFormData] = useState({
-    businessName: user?.businessName || '',
-    email: user?.email || '',
-    website: user?.website || '',
-    description: user?.description || '',
+    businessName: user?.businessName || "",
+    email: user?.email || "",
+    website: user?.website || "",
+    description: user?.description || "",
+    logo: user?.logo || "https://cdn-icons-png.flaticon.com/512/846/846423.png",
+    banner:
+      user?.banner ||
+      "https://img.freepik.com/free-vector/ombre-blue-curve-light-blue-background_53876-173299.jpg?semt=ais_hybrid&w=740",
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -16,13 +20,13 @@ export function UserProfile() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    
+
     try {
       await updateUserProfile(formData);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error("Error updating profile:", error);
     } finally {
       setSaving(false);
     }
@@ -31,8 +35,12 @@ export function UserProfile() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Profile Settings</h1>
-        <p className="text-gray-600">Manage your account information and preferences</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          Profile Settings
+        </h1>
+        <p className="text-gray-600">
+          Manage your account information and preferences
+        </p>
       </div>
 
       <div className="max-w-2xl">
@@ -42,7 +50,9 @@ export function UserProfile() {
               <User className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Account Information</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Account Information
+              </h2>
               <p className="text-gray-500">Update your profile details</p>
             </div>
           </div>
@@ -51,56 +61,128 @@ export function UserProfile() {
             <div className="flex items-center space-x-3">
               <Wallet className="w-5 h-5 text-gray-400" />
               <div>
-                <p className="text-sm font-medium text-gray-700">Connected Wallet</p>
-                <p className="text-sm text-gray-500 font-mono">{user?.walletAddress}</p>
+                <p className="text-sm font-medium text-gray-700">
+                  Connected Wallet
+                </p>
+                <p className="text-sm text-gray-500 font-mono">
+                  {user?.walletAddress}
+                </p>
               </div>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Business Name
+              </label>
               <input
                 type="text"
                 value={formData.businessName}
-                onChange={(e) => setFormData(prev => ({ ...prev, businessName: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    businessName: e.target.value,
+                  }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 placeholder="Your business or personal name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
               <input
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, email: e.target.value }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 placeholder="your@email.com"
               />
-              <p className="text-xs text-gray-500 mt-1">Used for payment notifications and receipts</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Used for payment notifications and receipts
+              </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Website
+              </label>
               <input
                 type="url"
                 value={formData.website}
-                onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, website: e.target.value }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 placeholder="https://your-website.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description
+              </label>
               <textarea
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 rows={4}
                 placeholder="Tell us about your business or what you're selling..."
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Logo URL
+              </label>
+              <input
+                type="url"
+                value={formData.logo}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, logo: e.target.value }))
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                placeholder="https://cdn-icons-png.flaticon.com/512/846/846423.png"
+              />
+              <div className="mt-2">
+                <img
+                  src={formData.logo}
+                  alt="Logo Preview"
+                  className="h-12 w-auto rounded bg-gray-100"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Banner URL
+              </label>
+              <input
+                type="url"
+                value={formData.banner}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, banner: e.target.value }))
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                placeholder="https://img.freepik.com/free-vector/ombre-blue-curve-light-blue-background_53876-173299.jpg?semt=ais_hybrid&w=740"
+              />
+              <div className="mt-2">
+                <img
+                  src={formData.banner}
+                  alt="Banner Preview"
+                  className="h-16 w-full object-cover rounded bg-gray-100"
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-between pt-4">
@@ -131,11 +213,13 @@ export function UserProfile() {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Statistics</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Account Statistics
+          </h3>
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className="text-2xl font-bold text-teal-600">
-                {user ? new Date(user.connectedAt).toLocaleDateString() : '-'}
+                {user ? new Date(user.connectedAt).toLocaleDateString() : "-"}
               </div>
               <div className="text-sm text-gray-500">Member Since</div>
             </div>

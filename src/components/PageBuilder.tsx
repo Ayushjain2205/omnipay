@@ -22,40 +22,51 @@ interface PageBuilderProps {
 
 export function PageBuilder({ onViewChange, initialPage }: PageBuilderProps) {
   const { updateCheckoutPage, addCheckoutPage } = useApp();
+
+  const normalizeBooleans = (page: Partial<CheckoutPage>): CheckoutPage =>
+    ({
+      ...page,
+      collectEmail: !!page.collectEmail,
+      collectNotes: !!page.collectNotes,
+      collectShipping: !!page.collectShipping,
+    } as CheckoutPage);
+
   const [currentPage, setCurrentPage] = useState<CheckoutPage>(
-    initialPage || {
-      id: "",
-      name: "My Product",
-      description: "Product description",
-      price: 99.99,
-      currency: "USD",
-      theme: "light",
-      layout: "centered",
-      typography: {
-        headingFont: "Inter",
-        bodyFont: "Inter",
-        fontSize: "medium",
-      },
-      content: {
-        headline: "",
-        subheadline: "",
-        features: [],
-        faq: [],
-      },
-      payoutChain: "ethereum",
-      walletAddress: "",
-      collectEmail: false,
-      collectNotes: false,
-      collectShipping: false,
-      customFields: [],
-      seo: {
-        title: "",
-        description: "",
-      },
-      status: "draft",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }
+    normalizeBooleans(
+      initialPage || {
+        id: "",
+        name: "My Product",
+        description: "Product description",
+        price: 99.99,
+        currency: "USD",
+        theme: "light",
+        layout: "centered",
+        typography: {
+          headingFont: "Inter",
+          bodyFont: "Inter",
+          fontSize: "medium",
+        },
+        content: {
+          headline: "",
+          subheadline: "",
+          features: [],
+          faq: [],
+        },
+        payoutChain: "ethereum",
+        walletAddress: "",
+        collectEmail: false,
+        collectNotes: false,
+        collectShipping: false,
+        customFields: [],
+        seo: {
+          title: "",
+          description: "",
+        },
+        status: "draft",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+    )
   );
 
   const [activeTab, setActiveTab] = useState<
@@ -609,23 +620,25 @@ function ContentPanel({
           </button>
         </div>
         <div className="space-y-2">
-          {(currentPage.content?.features || []).map((feature, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <input
-                type="text"
-                value={feature}
-                onChange={(e) => updateFeature(index, e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                placeholder="Feature description"
-              />
-              <button
-                onClick={() => removeFeature(index)}
-                className="text-red-500 hover:text-red-700"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
+          {(currentPage.content?.features || []).map(
+            (feature: string, index: number) => (
+              <div key={index} className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  value={feature}
+                  onChange={(e) => updateFeature(index, e.target.value)}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  placeholder="Feature description"
+                />
+                <button
+                  onClick={() => removeFeature(index)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            )
+          )}
         </div>
       </div>
 
@@ -718,37 +731,44 @@ function ContentPanel({
           </button>
         </div>
         <div className="space-y-4">
-          {(currentPage.content?.faq || []).map((item, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-3">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">
-                  FAQ {index + 1}
-                </span>
-                <button
-                  onClick={() => removeFaq(index)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+          {(currentPage.content?.faq || []).map(
+            (item: { question: string; answer: string }, index: number) => (
+              <div
+                key={index}
+                className="border border-gray-200 rounded-lg p-3"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">
+                    FAQ {index + 1}
+                  </span>
+                  <button
+                    onClick={() => removeFaq(index)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={item.question}
+                    onChange={(e) =>
+                      updateFaq(index, "question", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    placeholder="Question"
+                  />
+                  <textarea
+                    value={item.answer}
+                    onChange={(e) => updateFaq(index, "answer", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    rows={2}
+                    placeholder="Answer"
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  value={item.question}
-                  onChange={(e) => updateFaq(index, "question", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                  placeholder="Question"
-                />
-                <textarea
-                  value={item.answer}
-                  onChange={(e) => updateFaq(index, "answer", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                  rows={2}
-                  placeholder="Answer"
-                />
-              </div>
-            </div>
-          ))}
+            )
+          )}
         </div>
       </div>
     </div>
@@ -857,7 +877,7 @@ function FieldsPanel({
           </button>
         </div>
         <div className="space-y-4">
-          {(currentPage.customFields || []).map((field, index) => (
+          {(currentPage.customFields || []).map((field: any, index: number) => (
             <div
               key={field.id}
               className="border border-gray-200 rounded-lg p-3"

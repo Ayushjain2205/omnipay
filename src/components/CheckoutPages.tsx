@@ -78,14 +78,14 @@ export function CheckoutPages({ onViewChange }: CheckoutPagesProps) {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           {checkoutPages.map((page) => (
             <div
               key={page.id}
               className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
             >
               {/* Page Preview */}
-              <div className="h-32 bg-gradient-to-br from-blue-50 to-purple-50 relative overflow-hidden">
+              <div className="h-24 bg-gradient-to-br from-blue-50 to-purple-50 relative overflow-hidden">
                 {page.banner ? (
                   <img
                     src={page.banner}
@@ -100,7 +100,7 @@ export function CheckoutPages({ onViewChange }: CheckoutPagesProps) {
                     <img
                       src={page.logo}
                       alt="Logo"
-                      className="h-8 w-auto bg-white rounded p-1"
+                      className="h-6 w-auto bg-white rounded p-1"
                     />
                   </div>
                 )}
@@ -117,7 +117,7 @@ export function CheckoutPages({ onViewChange }: CheckoutPagesProps) {
                 </div>
               </div>
 
-              <div className="p-6">
+              <div className="p-4">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">
@@ -201,24 +201,22 @@ function CreatePageModal({
   onClose: () => void;
   onViewChange: (view: string, data?: any) => void;
 }) {
-  const { addCheckoutPage } = useApp();
+  const { addCheckoutPage, walletAddress } = useApp();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: "",
     payoutChain: "ethereum",
-    walletAddress: "",
-    logo: "",
-    banner: "",
+    walletAddress: walletAddress || "",
   });
+
+  // Update wallet address in form if it changes in context
+  React.useEffect(() => {
+    setFormData((prev) => ({ ...prev, walletAddress: walletAddress || "" }));
+  }, [walletAddress]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!formData.logo.trim()) {
-      alert("Logo is required for all checkout pages");
-      return;
-    }
 
     const newPage = {
       name: formData.name,
@@ -240,8 +238,6 @@ function CreatePageModal({
       },
       payoutChain: formData.payoutChain,
       walletAddress: formData.walletAddress,
-      logo: formData.logo,
-      banner: formData.banner || undefined,
       collectEmail: false,
       collectNotes: false,
       collectShipping: false,
@@ -317,43 +313,6 @@ function CreatePageModal({
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
               required
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Logo URL *
-            </label>
-            <input
-              type="url"
-              value={formData.logo}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, logo: e.target.value }))
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-              placeholder="https://example.com/logo.png"
-              required
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Required: Your brand logo will appear on every checkout page
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Banner Image URL (Optional)
-            </label>
-            <input
-              type="url"
-              value={formData.banner}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, banner: e.target.value }))
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-              placeholder="https://example.com/banner.jpg"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Optional: Hero banner image for your checkout page
-            </p>
           </div>
 
           <div className="omnipay-dropdown">

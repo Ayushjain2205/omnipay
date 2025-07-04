@@ -15,6 +15,7 @@ interface AppContextType {
   checkoutPages: CheckoutPage[];
   payments: Payment[];
   loading: boolean;
+  user: User | null;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -38,6 +39,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [checkoutPages, setCheckoutPages] = useState<CheckoutPage[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   // Fetch all checkout pages from the database, not just for the current wallet
   useEffect(() => {
@@ -53,6 +55,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
       });
   }, []);
 
+  // Fetch user profile from the database when walletAddress changes
+  useEffect(() => {
+    if (!walletAddress) {
+      setUser(null);
+      return;
+    }
+    setLoading(true);
+    supabase
+      .from("users")
+      .select("*")
+      .eq("wallet_address", walletAddress)
+      .single()
+      .then(({ data, error }) => {
+        if (!error && data) {
+          setUser(data);
+        }
+        setLoading(false);
+      });
+  }, [walletAddress]);
+
   // All auth functions are now no-ops
   const signInWithEmail = async () => {};
   const signUpWithEmail = async () => {};
@@ -62,12 +84,34 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const addCheckoutPage = async (
     page: Omit<CheckoutPage, "id" | "createdAt" | "updatedAt">
   ) => {
-    const dbPage = transformCheckoutPageToDB(page);
+    if (!walletAddress) {
+      console.error("Cannot create page: walletAddress is not set.");
+      return;
+    }
+    // Only send required fields for insert
+    const insertObj = {
+      name: page.name,
+      wallet_address: walletAddress,
+      price: page.price,
+      description: page.description,
+      currency: page.currency,
+      status: page.status,
+      collect_email: page.collectEmail ?? false,
+      // Use logo for both logo and product_image for now
+      logo: page.logo,
+      product_image: page.logo,
+      // collect_notes: page.collectNotes ?? false,
+      // collect_shipping: page.collectShipping ?? false,
+    };
     const { data, error } = await supabase
       .from("checkout_pages")
-      .insert([dbPage])
+      .insert([insertObj])
       .select();
-    if (!error && data) {
+    if (error) {
+      console.error("Error inserting checkout page:", error);
+      return;
+    }
+    if (data) {
       setCheckoutPages((prev) => [
         ...prev,
         transformCheckoutPageFromDB(data[0]),
@@ -109,7 +153,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // The rest of the context functions can remain as stubs or no-ops
   const addPayment = async () => {};
   const getCheckoutPage = () => undefined;
-  const updateUserProfile = async () => {};
+  const updateUserProfile = async (updates: Partial<User>) => {
+    if (!walletAddress) return;
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("users")
+      .update(updates)
+      .eq("wallet_address", walletAddress)
+      .select();
+    if (!error && data && data[0]) {
+      setUser(data[0]);
+    }
+    setLoading(false);
+  };
 
   return (
     <AppContext.Provider
@@ -119,6 +175,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         checkoutPages,
         payments,
         loading,
+        user,
         signInWithEmail,
         signUpWithEmail,
         signOut,
