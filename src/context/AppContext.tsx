@@ -58,17 +58,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const signUpWithEmail = async () => {};
   const signOut = async () => {};
 
-  // Replace addCheckoutPage with minimal insert
-  const addCheckoutPage = async (page: {
-    name: string;
-    walletAddress: string;
-  }) => {
+  // Replace addCheckoutPage with full insert
+  const addCheckoutPage = async (
+    page: Omit<CheckoutPage, "id" | "createdAt" | "updatedAt">
+  ) => {
+    const dbPage = transformCheckoutPageToDB(page);
     const { data, error } = await supabase
       .from("checkout_pages")
-      .insert([{ name: page.name, wallet_address: page.walletAddress }])
+      .insert([dbPage])
       .select();
     if (!error && data) {
-      setCheckoutPages((prev) => [...prev, data[0]]);
+      setCheckoutPages((prev) => [
+        ...prev,
+        transformCheckoutPageFromDB(data[0]),
+      ]);
     }
   };
 
@@ -77,13 +80,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     id: string,
     updates: Partial<CheckoutPage>
   ) => {
-    if (!walletAddress) return;
-    const dbUpdates = transformCheckoutPageToDB({ ...updates, walletAddress });
+    const dbUpdates = transformCheckoutPageToDB(updates);
     const { data, error } = await supabase
       .from("checkout_pages")
       .update(dbUpdates)
       .eq("id", id)
-      .eq("wallet_address", walletAddress)
       .select();
     if (!error && data) {
       setCheckoutPages((prev) =>
