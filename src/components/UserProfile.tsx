@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { User, Save, Wallet } from "lucide-react";
+import { User, Save, Wallet, Copy as CopyIcon } from "lucide-react";
 import { useApp } from "../context/AppContext";
 
 export function UserProfile() {
-  const { user, updateUserProfile } = useApp();
+  const { user, updateUserProfile, walletAddress } = useApp();
   const [formData, setFormData] = useState({
     businessName: user?.businessName || "",
     email: user?.email || "",
@@ -33,17 +33,17 @@ export function UserProfile() {
   };
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Profile Settings
-        </h1>
-        <p className="text-gray-600">
-          Manage your account information and preferences
-        </p>
-      </div>
+    <div className="min-h-screen flex justify-center items-start p-8 bg-gray-50">
+      <div className="w-full max-w-2xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Profile Settings
+          </h1>
+          <p className="text-gray-600">
+            Manage your account information and preferences
+          </p>
+        </div>
 
-      <div className="max-w-2xl">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex items-center space-x-4 mb-6">
             <div className="w-16 h-16 bg-gradient-to-r from-teal-600 to-blue-600 rounded-full flex items-center justify-center">
@@ -64,9 +64,25 @@ export function UserProfile() {
                 <p className="text-sm font-medium text-gray-700">
                   Connected Wallet
                 </p>
-                <p className="text-sm text-gray-500 font-mono">
-                  {user?.walletAddress}
-                </p>
+                <div className="flex items-center space-x-2 mt-1">
+                  <span className="text-base font-mono text-blue-700 bg-blue-50 px-2 py-1 rounded">
+                    {user?.walletAddress || walletAddress || "Not connected"}
+                  </span>
+                  {(user?.walletAddress || walletAddress) && (
+                    <button
+                      type="button"
+                      className="text-blue-600 hover:text-blue-800 px-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          user?.walletAddress || walletAddress || ""
+                        );
+                      }}
+                      title="Copy address"
+                    >
+                      <CopyIcon className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
