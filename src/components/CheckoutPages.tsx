@@ -13,6 +13,7 @@ import { useApp } from "../context/AppContext";
 import { CheckoutPage } from "../types";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
+import QRCode from "react-qr-code";
 
 interface CheckoutPagesProps {
   onViewChange: (view: string, data?: any) => void;
@@ -21,6 +22,10 @@ interface CheckoutPagesProps {
 export function CheckoutPages({ onViewChange }: CheckoutPagesProps) {
   const { checkoutPages, deleteCheckoutPage } = useApp();
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [qrModal, setQrModal] = useState<{
+    open: boolean;
+    link: string | null;
+  }>({ open: false, link: null });
 
   const handleCreatePage = () => {
     setShowCreateForm(true);
@@ -42,8 +47,8 @@ export function CheckoutPages({ onViewChange }: CheckoutPagesProps) {
   };
 
   const generateQR = (pageId: string) => {
-    // In a real app, this would generate a QR code
-    alert(`QR code for page ${pageId} would be generated here`);
+    const link = `${window.location.origin}/checkout/${pageId}`;
+    setQrModal({ open: true, link });
   };
 
   return (
@@ -196,6 +201,37 @@ export function CheckoutPages({ onViewChange }: CheckoutPagesProps) {
           onClose={() => setShowCreateForm(false)}
           onViewChange={onViewChange}
         />
+      )}
+
+      {qrModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-xl p-6 shadow-lg flex flex-col items-center relative w-full max-w-xs">
+            <button
+              onClick={() => setQrModal({ open: false, link: null })}
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl font-bold"
+              title="Close"
+            >
+              ×
+            </button>
+            <h3 className="text-lg font-semibold mb-4 text-center">
+              Share Payment Link
+            </h3>
+            {qrModal.link && (
+              <QRCode value={qrModal.link} size={180} className="mb-4" />
+            )}
+            <div className="text-xs text-gray-500 break-all mb-2 text-center">
+              {qrModal.link}
+            </div>
+            <button
+              onClick={() => {
+                if (qrModal.link) navigator.clipboard.writeText(qrModal.link);
+              }}
+              className="mt-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm"
+            >
+              Copy Link
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
