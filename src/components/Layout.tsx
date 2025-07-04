@@ -29,7 +29,6 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
               </div>
               <div>
                 <h1 className="text-lg font-bold text-gray-900">OmniPay</h1>
-                <p className="text-xs text-gray-500 -mt-1">Pages</p>
               </div>
             </div>
 
