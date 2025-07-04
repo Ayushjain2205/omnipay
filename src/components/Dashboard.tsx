@@ -220,7 +220,12 @@ export function Dashboard({ onViewChange }: DashboardProps) {
                       <h3 className="font-medium text-gray-900">
                         ${payment.amount}
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 flex items-center space-x-1">
+                        <img
+                          src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png?1696506694"
+                          alt="USDC"
+                          className="inline w-4 h-4 mr-1"
+                        />
                         {payment.paymentMethod} • {payment.fromChain}
                       </p>
                     </div>

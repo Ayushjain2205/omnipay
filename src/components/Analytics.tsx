@@ -214,7 +214,12 @@ export function Analytics() {
                       {payment.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 flex items-center space-x-1">
+                    <img
+                      src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png?1696506694"
+                      alt="USDC"
+                      className="inline w-4 h-4 mr-1"
+                    />
                     {payment.paymentMethod}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
