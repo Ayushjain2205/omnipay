@@ -19,6 +19,59 @@ interface CheckoutPagesProps {
   onViewChange: (view: string, data?: any) => void;
 }
 
+const CHAINS = [
+  {
+    value: "ethereum",
+    label: "Ethereum",
+    icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png?1696501628",
+  },
+  {
+    value: "polygon",
+    label: "Polygon",
+    icon: "https://assets.coingecko.com/coins/images/4713/standard/polygon.png?1698233745",
+  },
+  {
+    value: "arbitrum",
+    label: "Arbitrum",
+    icon: "https://assets.coingecko.com/coins/images/16547/standard/arb.jpg?1721358242",
+  },
+  {
+    value: "optimism",
+    label: "Optimism",
+    icon: "https://assets.coingecko.com/coins/images/25244/standard/Optimism.png?1696524385",
+  },
+  {
+    value: "celo",
+    label: "Celo",
+    icon: "https://assets.coingecko.com/coins/images/11090/standard/InjXBNx9_400x400.jpg?1696511031",
+  },
+  {
+    value: "avalanche",
+    label: "Avalanche",
+    icon: "https://assets.coingecko.com/coins/images/12559/standard/Avalanche_Circle_RedWhite_Trans.png?1696512369",
+  },
+  {
+    value: "sonic",
+    label: "Sonic",
+    icon: "https://assets.coingecko.com/coins/images/38108/standard/200x200_Sonic_Logo.png?1734679256",
+  },
+  {
+    value: "base",
+    label: "Base",
+    icon: "https://assets.coingecko.com/nft_contracts/images/2989/standard/base-introduced.png?1707289780",
+  },
+  {
+    value: "worldchain",
+    label: "Worldchain",
+    icon: "https://assets.coingecko.com/coins/images/31069/standard/worldcoin.jpeg?1696529903",
+  },
+  {
+    value: "unichain",
+    label: "Unichain",
+    icon: "https://coinfactory.app/images/networks/unichainSepolia.svg",
+  },
+];
+
 export function CheckoutPages({ onViewChange }: CheckoutPagesProps) {
   const { checkoutPages, deleteCheckoutPage } = useApp();
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -252,6 +305,7 @@ function CreatePageModal({
     payoutChain: "ethereum",
     walletAddress: walletAddress || "",
   });
+  const [showChainDropdown, setShowChainDropdown] = useState(false);
 
   // Update wallet address in form if it changes in context
   React.useEffect(() => {
@@ -358,28 +412,72 @@ function CreatePageModal({
             />
           </div>
 
-          <div className="omnipay-dropdown">
-            <select
-              value={formData.payoutChain}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  payoutChain: e.target.value,
-                }))
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+          <div className="omnipay-dropdown relative">
+            <button
+              type="button"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 flex items-center justify-between"
+              onClick={() => setShowChainDropdown((v) => !v)}
             >
-              <option value="ethereum">Ethereum</option>
-              <option value="polygon">Polygon</option>
-              <option value="arbitrum">Arbitrum</option>
-              <option value="optimism">Optimism</option>
-              <option value="bsc">Celo</option>
-              <option value="avalanche">Avalanche</option>
-              <option value="fantom">Sonic</option>
-              <option value="base">Base</option>
-              <option value="worldchain">Worldchain</option>
-              <option value="unichain">Unichain</option>
-            </select>
+              {CHAINS.find((c) => c.value === formData.payoutChain) ? (
+                <span className="flex items-center space-x-2">
+                  <img
+                    src={
+                      CHAINS.find((c) => c.value === formData.payoutChain)?.icon
+                    }
+                    alt=""
+                    className="w-5 h-5 mr-2 inline"
+                  />
+                  <span>
+                    {
+                      CHAINS.find((c) => c.value === formData.payoutChain)
+                        ?.label
+                    }
+                  </span>
+                </span>
+              ) : (
+                <span>Select Chain</span>
+              )}
+              <svg
+                className="w-4 h-4 ml-2"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            {showChainDropdown && (
+              <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+                {CHAINS.map((chain) => (
+                  <button
+                    type="button"
+                    key={chain.value}
+                    className={`w-full flex items-center px-4 py-2 hover:bg-teal-50 transition-colors ${
+                      formData.payoutChain === chain.value ? "bg-teal-100" : ""
+                    }`}
+                    onClick={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        payoutChain: chain.value,
+                      }));
+                      setShowChainDropdown(false);
+                    }}
+                  >
+                    <img
+                      src={chain.icon}
+                      alt={chain.label}
+                      className="w-5 h-5 mr-2"
+                    />
+                    <span>{chain.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>
