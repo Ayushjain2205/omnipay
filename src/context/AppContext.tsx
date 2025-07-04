@@ -1,11 +1,17 @@
-import React, { createContext, useContext, ReactNode, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
 import { CheckoutPage, Payment, User } from "../types";
-// import { supabase } from '../lib/supabase';
+import { supabase } from "../lib/supabase";
 // import { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface AppContextType {
-  user: User | null;
-  supabaseUser: any; // No longer used
+  walletAddress: string | null;
+  setWalletAddress: (address: string | null) => void;
   checkoutPages: CheckoutPage[];
   payments: Payment[];
   loading: boolean;
@@ -13,7 +19,7 @@ interface AppContextType {
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   addCheckoutPage: (
-    page: Omit<CheckoutPage, "id" | "user_id" | "createdAt" | "updatedAt">
+    page: Omit<CheckoutPage, "id" | "createdAt" | "updatedAt">
   ) => Promise<void>;
   updateCheckoutPage: (
     id: string,
@@ -28,29 +34,78 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  // Always provide a mock user and set loading to false
-  const [user] = useState<User>({
-    id: "mock-user-id",
-    walletAddress: "0xMOCKADDRESS",
-    email: "mock@example.com",
-    businessName: "Mock Business",
-    website: "https://mock.com",
-    description: "This is a mock user.",
-    connectedAt: new Date().toISOString(),
-  });
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [checkoutPages, setCheckoutPages] = useState<CheckoutPage[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch all checkout pages from the database, not just for the current wallet
+  useEffect(() => {
+    setLoading(true);
+    supabase
+      .from("checkout_pages")
+      .select("*")
+      .then(({ data, error }) => {
+        if (!error && data) {
+          setCheckoutPages(data);
+        }
+        setLoading(false);
+      });
+  }, []);
 
   // All auth functions are now no-ops
   const signInWithEmail = async () => {};
   const signUpWithEmail = async () => {};
   const signOut = async () => {};
 
+  // Replace addCheckoutPage with minimal insert
+  const addCheckoutPage = async (page: {
+    name: string;
+    walletAddress: string;
+  }) => {
+    const { data, error } = await supabase
+      .from("checkout_pages")
+      .insert([{ name: page.name, wallet_address: page.walletAddress }])
+      .select();
+    if (!error && data) {
+      setCheckoutPages((prev) => [...prev, data[0]]);
+    }
+  };
+
+  // Update checkout page
+  const updateCheckoutPage = async (
+    id: string,
+    updates: Partial<CheckoutPage>
+  ) => {
+    if (!walletAddress) return;
+    const dbUpdates = transformCheckoutPageToDB({ ...updates, walletAddress });
+    const { data, error } = await supabase
+      .from("checkout_pages")
+      .update(dbUpdates)
+      .eq("id", id)
+      .eq("wallet_address", walletAddress)
+      .select();
+    if (!error && data) {
+      setCheckoutPages((prev) =>
+        prev.map((p) =>
+          p.id === id ? transformCheckoutPageFromDB(data[0]) : p
+        )
+      );
+    }
+  };
+
+  // Delete checkout page by id only
+  const deleteCheckoutPage = async (id: string) => {
+    const { error } = await supabase
+      .from("checkout_pages")
+      .delete()
+      .eq("id", id);
+    if (!error) {
+      setCheckoutPages((prev) => prev.filter((p) => p.id !== id));
+    }
+  };
+
   // The rest of the context functions can remain as stubs or no-ops
-  const addCheckoutPage = async () => {};
-  const updateCheckoutPage = async () => {};
-  const deleteCheckoutPage = async () => {};
   const addPayment = async () => {};
   const getCheckoutPage = () => undefined;
   const updateUserProfile = async () => {};
@@ -58,8 +113,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider
       value={{
-        user,
-        supabaseUser: null,
+        walletAddress,
+        setWalletAddress,
         checkoutPages,
         payments,
         loading,
@@ -91,7 +146,6 @@ export function useApp() {
 function transformCheckoutPageFromDB(dbPage: any): CheckoutPage {
   return {
     id: dbPage.id,
-    user_id: dbPage.user_id,
     name: dbPage.name,
     description: dbPage.description,
     price: parseFloat(dbPage.price),
@@ -120,25 +174,24 @@ function transformCheckoutPageFromDB(dbPage: any): CheckoutPage {
 function transformCheckoutPageToDB(appPage: any) {
   return {
     id: appPage.id,
-    user_id: appPage.user_id,
     name: appPage.name,
     description: appPage.description,
     price: appPage.price,
     currency: appPage.currency,
     logo: appPage.logo,
     banner: appPage.banner,
-    product_image: appPage.productImage,
+    product_image: appPage.product_image,
     theme: appPage.theme,
-    custom_colors: appPage.customColors,
+    custom_colors: appPage.custom_colors,
     layout: appPage.layout,
     typography: appPage.typography,
     content: appPage.content,
-    payout_chain: appPage.payoutChain,
-    wallet_address: appPage.walletAddress,
-    collect_email: appPage.collectEmail,
-    collect_notes: appPage.collectNotes,
-    collect_shipping: appPage.collectShipping,
-    custom_fields: appPage.customFields,
+    payout_chain: appPage.payout_chain,
+    wallet_address: appPage.wallet_address,
+    collect_email: appPage.collect_email,
+    collect_notes: appPage.collect_notes,
+    collect_shipping: appPage.collect_shipping,
+    custom_fields: appPage.custom_fields,
     seo: appPage.seo,
     status: appPage.status,
   };

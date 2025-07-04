@@ -1,61 +1,27 @@
 export interface CheckoutPage {
   id: string;
-  user_id: string;
   name: string;
-  description: string;
+  description?: string;
   price: number;
   currency: string;
   logo?: string;
   banner?: string;
   productImage?: string;
-  theme: 'light' | 'dark' | 'custom';
-  customColors?: {
-    primary: string;
-    secondary: string;
-    background: string;
-    text: string;
-    accent: string;
-  };
-  layout: 'centered' | 'split' | 'minimal' | 'hero';
-  typography: {
-    headingFont: string;
-    bodyFont: string;
-    fontSize: 'small' | 'medium' | 'large';
-  };
-  content: {
-    headline?: string;
-    subheadline?: string;
-    features?: string[];
-    testimonial?: {
-      text: string;
-      author: string;
-      role: string;
-    };
-    faq?: Array<{
-      question: string;
-      answer: string;
-    }>;
-  };
-  payoutChain: string;
+  theme?: string;
+  customColors?: any;
+  layout?: string;
+  typography?: any;
+  content?: any;
+  payoutChain?: string;
   walletAddress: string;
-  collectEmail: boolean;
-  collectNotes: boolean;
-  collectShipping: boolean;
-  customFields?: Array<{
-    id: string;
-    label: string;
-    type: 'text' | 'email' | 'phone' | 'select' | 'textarea';
-    required: boolean;
-    options?: string[];
-  }>;
-  seo: {
-    title: string;
-    description: string;
-    ogImage?: string;
-  };
-  status: 'draft' | 'published';
-  createdAt: string;
-  updatedAt: string;
+  collectEmail?: boolean;
+  collectNotes?: boolean;
+  collectShipping?: boolean;
+  customFields?: any;
+  seo?: any;
+  status?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Payment {
@@ -64,7 +30,7 @@ export interface Payment {
   userId: string;
   amount: number;
   currency: string;
-  status: 'pending' | 'success' | 'failed';
+  status: "pending" | "success" | "failed";
   txHash?: string;
   buyerEmail?: string;
   notes?: string;

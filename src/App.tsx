@@ -9,6 +9,7 @@ import { CheckoutPageView } from "./components/CheckoutPageView";
 import { Analytics } from "./components/Analytics";
 import { UserProfile } from "./components/UserProfile";
 import { useAccount } from "wagmi";
+import WalletSyncer from "./components/WalletSyncer";
 
 function AppContent() {
   const { isConnected, isConnecting } = useAccount();
@@ -64,6 +65,7 @@ function AppContent() {
 function App() {
   return (
     <AppProvider>
+      <WalletSyncer />
       <AppContent />
     </AppProvider>
   );

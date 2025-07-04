@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { CheckoutPage } from '../types';
-import { CheckoutPageDisplay } from './CheckoutPageDisplay';
+import React, { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
+import { CheckoutPage } from "../types";
+import { CheckoutPageDisplay } from "./CheckoutPageDisplay";
 
 interface CheckoutPageViewProps {
   pageId: string;
@@ -16,10 +16,10 @@ export function CheckoutPageView({ pageId, onBack }: CheckoutPageViewProps) {
     const loadPage = async () => {
       try {
         const { data, error } = await supabase
-          .from('checkout_pages')
-          .select('*')
-          .eq('id', pageId)
-          .eq('status', 'published')
+          .from("checkout_pages")
+          .select("*")
+          .eq("id", pageId)
+          .eq("status", "published")
           .single();
 
         if (error) throw error;
@@ -27,7 +27,6 @@ export function CheckoutPageView({ pageId, onBack }: CheckoutPageViewProps) {
         if (data) {
           setPage({
             id: data.id,
-            user_id: data.user_id,
             name: data.name,
             description: data.description,
             price: parseFloat(data.price),
@@ -53,7 +52,7 @@ export function CheckoutPageView({ pageId, onBack }: CheckoutPageViewProps) {
           });
         }
       } catch (error) {
-        console.error('Error loading checkout page:', error);
+        console.error("Error loading checkout page:", error);
       } finally {
         setLoading(false);
       }
@@ -77,8 +76,13 @@ export function CheckoutPageView({ pageId, onBack }: CheckoutPageViewProps) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Page not found</h1>
-          <p className="text-gray-600 mb-4">The checkout page you're looking for doesn't exist or is not published.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Page not found
+          </h1>
+          <p className="text-gray-600 mb-4">
+            The checkout page you're looking for doesn't exist or is not
+            published.
+          </p>
           <button
             onClick={onBack}
             className="text-teal-600 hover:text-teal-700 font-medium"

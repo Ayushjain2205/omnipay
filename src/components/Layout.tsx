@@ -55,7 +55,7 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
             </nav>
 
             {/* Mobile Navigation */}
-            <div className="md:hidden">
+            <div className="md:hidden omnipay-dropdown">
               <select
                 value={currentView}
                 onChange={(e) => onViewChange(e.target.value)}
