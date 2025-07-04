@@ -1003,9 +1003,12 @@ function SettingsPanel({
               <option value="polygon">Polygon</option>
               <option value="arbitrum">Arbitrum</option>
               <option value="optimism">Optimism</option>
-              <option value="bsc">BSC</option>
+              <option value="bsc">Celo</option>
               <option value="avalanche">Avalanche</option>
-              <option value="fantom">Fantom</option>
+              <option value="fantom">Sonic</option>
+              <option value="base">Base</option>
+              <option value="worldchain">Worldchain</option>
+              <option value="unichain">Unichain</option>
             </select>
           </div>
           <div>
