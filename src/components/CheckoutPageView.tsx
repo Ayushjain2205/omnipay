@@ -19,7 +19,6 @@ export function CheckoutPageView({ pageId, onBack }: CheckoutPageViewProps) {
           .from("checkout_pages")
           .select("*")
           .eq("id", pageId)
-          .eq("status", "published")
           .single();
 
         if (error) throw error;

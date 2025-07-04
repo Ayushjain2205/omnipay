@@ -78,7 +78,7 @@
   padding: 0.5rem 0.75rem !important;
 }
 
-/* Override for input, textarea, and button fields */
+/* Override for input, textarea, and button fields
 .omnipay-form input,
 .omnipay-form textarea,
 .omnipay-form select {
@@ -89,7 +89,7 @@
   box-shadow: none !important;
   font-size: 1rem !important;
   padding: 0.5rem 0.75rem !important;
-}
+} */
 
 /* Fix for layout/theme panel buttons and text */
 .omnipay-panel button,
