@@ -8,7 +8,7 @@ import {
   Globe,
 } from "lucide-react";
 import { CheckoutPage } from "../types";
-import { LiFiWidget } from "@lifi/widget";
+import { LiFiWidget, ChainType } from "@lifi/widget";
 import { useApp } from "../context/AppContext";
 
 interface CheckoutPageDisplayProps {
@@ -21,6 +21,9 @@ export function CheckoutPageDisplay({
   isPreview = false,
 }: CheckoutPageDisplayProps) {
   const { user } = useApp();
+  // Debug: Log the full page and user objects
+  console.log("CheckoutPageDisplay page object:", page);
+  console.log("CheckoutPageDisplay user object:", user);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   const isDark = page.theme === "dark";
@@ -67,6 +70,12 @@ export function CheckoutPageDisplay({
     page.banner ||
     user?.banner ||
     "https://img.freepik.com/free-vector/ombre-blue-curve-light-blue-background_53876-173299.jpg?semt=ais_hybrid&w=740";
+
+  // Debug: Log the values passed to LiFiWidget
+  const lifiToChain = page.toChain || 1;
+  const lifiToAddress = page.walletAddress || "";
+  console.log("LiFiWidget toChain:", lifiToChain);
+  console.log("LiFiWidget toAddress:", lifiToAddress);
 
   return (
     <div
@@ -481,6 +490,17 @@ export function CheckoutPageDisplay({
               config={{
                 variant: "wide",
                 appearance: "light",
+                // fromChain: 137,
+                // fromToken: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+                toChain: 10,
+                toToken: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+                toAddress: {
+                  address: lifiToAddress,
+                  chainType: ChainType.EVM,
+                  name: "Checkout Private Limited",
+                },
+                fromAmount: page.price,
+                formUpdateKey: `${lifiToChain}-${lifiToAddress}-${Date.now()}`,
                 theme: {
                   colorSchemes: {
                     light: {

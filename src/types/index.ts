@@ -22,6 +22,8 @@ export interface CheckoutPage {
   status?: string;
   createdAt?: string;
   updatedAt?: string;
+  toChain?: number;
+  toAddress?: string;
 }
 
 export interface Payment {
